@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kairos 提案書 ｜ UI・日本語・導線チェックで「自然さ」を実装する</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#10131F;
+    --bg-deep2:#171C2E;
+    --bg-light:#F2F3F7;
+    --panel:#FFFFFF;
+    --ink:#1C2030;
+    --muted:#6B7085;
+    --indigo:#4C56D6;
+    --indigo-deep:#333C9E;
+    --rose:#FF4D6D;
+    --teal:#22C7B5;
+    --line:#E1E3EC;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg-light);
+    color:var(--ink);
+    font-family:"Noto Sans JP", sans-serif;
+    font-weight:400;
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.jp-head{
+    font-family:"Space Grotesk","Noto Sans JP",sans-serif;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+  a{color:inherit;}
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(76,86,214,0.35), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(34,199,181,0.25), transparent 50%),
+      linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-deep2) 100%);
+    color:#F4F5FB;
+    padding:120px 0 100px;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 64px);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .kairos-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:#AEB4E8;
+    border:1px solid rgba(174,180,232,0.4);
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:36px;
+  }
+  .kairos-tag::before{
+    content:"";
+    width:7px;height:7px;border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 8px var(--teal);
+  }
+  .glitch{
+    position:relative;
+    font-size:clamp(32px, 5.4vw, 60px);
+    font-weight:700;
+    line-height:1.3;
+    margin:0 0 28px;
+    letter-spacing:0.01em;
+  }
+  .glitch span{position:relative; display:inline-block;}
+  .glitch span::before,
+  .glitch span::after{
+    content:attr(data-text);
+    position:absolute;
+    left:0; top:0;
+    width:100%;
+    mix-blend-mode:screen;
+  }
+  .glitch span::before{color:var(--rose); transform:translate(-2.5px,1.5px);}
+  .glitch span::after{color:var(--teal); transform:translate(2.5px,-1.5px);}
+
+  .hero-sub{
+    font-size:16px;
+    color:#C4C8E4;
+    max-width:620px;
+    margin:0 0 44px;
+  }
+  .hero-sub b{color:#fff; font-weight:500;}
+  .hero-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .hero-meta div{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.14);
+    padding:12px 18px;
+    border-radius:10px;
+    font-size:13px;
+    color:#D7D9EE;
+  }
+  .hero-meta strong{
+    display:block;
+    font-size:15px;
+    color:#fff;
+    font-family:"Space Grotesk",sans-serif;
+  }
+
+  /* ===== SECTION COMMON ===== */
+  section{padding:96px 0;}
+  .section-head{
+    margin-bottom:56px;
+  }
+  .eyebrow{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:13px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--indigo);
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:28px; height:2px;
+    background:var(--rose);
+  }
+  .section-head h2{
+    font-size:clamp(24px,3.4vw,34px);
+    margin:0 0 18px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .section-head p{
+    color:var(--muted);
+    max-width:640px;
+    font-size:15px;
+  }
+
+  /* ===== UNDERSTANDING ===== */
+  .understand{background:var(--panel);}
+  .diff-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:20px;
+  }
+  .diff-card{
+    background:var(--bg-light);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:28px;
+  }
+  .diff-card .tag{
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:12px;
+    display:block;
+  }
+  .diff-before{
+    font-size:15px;
+    color:var(--rose);
+    text-decoration:line-through;
+    text-decoration-color:rgba(255,77,109,0.5);
+    margin-bottom:10px;
+  }
+  .diff-after{
+    font-size:15px;
+    color:var(--indigo-deep);
+    font-weight:500;
+  }
+  .diff-why{
+    margin-top:14px;
+    font-size:13px;
+    color:var(--muted);
+    border-top:1px dashed var(--line);
+    padding-top:14px;
+  }
+
+  /* ===== VALUE CARDS ===== */
+  .value-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:22px;
+  }
+  .value-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:32px 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  .value-card::after{
+    content:"";
+    position:absolute;
+    top:-40px; right:-40px;
+    width:100px; height:100px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(76,86,214,0.14), transparent 70%);
+  }
+  .value-num{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:13px;
+    color:var(--teal);
+    letter-spacing:0.1em;
+    margin-bottom:16px;
+    display:block;
+  }
+  .value-card h3{
+    font-size:18px;
+    margin:0 0 12px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .value-card p{
+    font-size:14px;
+    color:var(--muted);
+    margin:0;
+  }
+  .value-card.wide{grid-column:span 1;}
+
+  /* ===== FLOW ===== */
+  .flow{background:var(--bg-deep);}
+  .flow .section-head h2{color:#fff;}
+  .flow .section-head p{color:#A9ADC8;}
+  .flow .eyebrow{color:var(--teal);}
+  .flow .eyebrow::before{background:var(--teal);}
+  .timeline{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:16px;
+    counter-reset:step;
+  }
+  .step{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:14px;
+    padding:26px 20px;
+    position:relative;
+    color:#D7D9EE;
+  }
+  .step::before{
+    counter-increment:step;
+    content:"0" counter(step);
+    font-family:"Space Grotesk",sans-serif;
+    font-size:24px;
+    color:var(--rose);
+    display:block;
+    margin-bottom:14px;
+  }
+  .step h4{
+    font-size:15px;
+    color:#fff;
+    margin:0 0 8px;
+    font-weight:500;
+  }
+  .step p{
+    font-size:12.5px;
+    color:#A9ADC8;
+    margin:0;
+  }
+
+  /* ===== CLOSING ===== */
+  .closing{
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255,77,109,0.18), transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(34,199,181,0.2), transparent 50%),
+      var(--bg-deep2);
+    color:#fff;
+    text-align:center;
+    padding:110px 0;
+  }
+  .closing h2{
+    font-size:clamp(26px,4vw,40px);
+    margin:0 0 20px;
+    font-weight:600;
+  }
+  .closing p{
+    color:#C4C8E4;
+    max-width:560px;
+    margin:0 auto 42px;
+    font-size:15px;
+  }
+  .cta-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background:linear-gradient(90deg, var(--indigo), var(--teal));
+    color:#fff;
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:600;
+    font-size:15px;
+    padding:18px 38px;
+    border-radius:999px;
+    text-decoration:none;
+    letter-spacing:0.02em;
+    box-shadow:0 14px 34px -10px rgba(76,86,214,0.6);
+  }
+  .cta-note{
+    margin-top:28px;
+    font-size:12.5px;
+    color:#8389AA;
+  }
+
+  footer{
+    background:var(--bg-deep);
+    color:#6A6F8C;
+    text-align:center;
+    font-size:12px;
+    padding:28px 0;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width:860px){
+    .diff-grid{grid-template-columns:1fr;}
+    .value-grid{grid-template-columns:repeat(2,1fr);}
+    .timeline{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:560px){
+    .hero{padding:90px 0 70px;}
+    section{padding:72px 0;}
+    .value-grid{grid-template-columns:1fr;}
+    .timeline{grid-template-columns:1fr;}
+    .hero-meta{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <span class="kairos-tag">Proposal from Kairos</span>
+      <h1 class="glitch">
+        <span data-text="「翻訳されている」から">「翻訳されている」から</span><br>
+        <span data-text="「使われている」へ。">「使われている」へ。</span>
+      </h1>
+      <p class="hero-sub">
+        海外発のサービスが日本で信頼されるかどうかは、<b>言葉とUIの"ズレ"にユーザーが気づく前</b>に
+        見つけられるかで決まります。Kairosは、日本語ネイティブの視点でそのズレを洗い出し、
+        具体的な直し方まで提案します。
+      </p>
+      <div class="hero-meta">
+        <div><strong>¥10,000〜30,000</strong>想定予算レンジ</div>
+        <div><strong>PC / SP 両対応</strong>実機チェック体制</div>
+        <div><strong>継続前提</strong>のご相談も歓迎</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UNDERSTANDING -->
+  <section class="understand">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Understanding</span>
+        <h2>この案件、こう理解しています。</h2>
+        <p>
+          成人向けAIサービスという特性上、「怪しさ」「不自然さ」は離脱に直結します。
+          求められているのは誤字脱字の修正ではなく、<strong>日本人ユーザーが無意識に感じる違和感を
+          言語化し、改善案まで落とし込む</strong>こと。募集文にあった例をもとに、
+          私たちが見ているポイントを示します。
+        </p>
+      </div>
+      <div class="diff-grid">
+        <div class="diff-card">
+          <span class="tag">FAQ／文言</span>
+          <div class="diff-before">「支払いの定期購読はどのように解約しますか？」</div>
+          <div class="diff-after">→「定期購入の解約は必要ですか？」</div>
+          <div class="diff-why">機械翻訳由来の「定期購読」が実際のサービス導線と噛み合っておらず、解約手順への不安を誘発します。</div>
+        </div>
+        <div class="diff-card">
+          <span class="tag">決済／クレジット購入</span>
+          <div class="diff-before">欧米型の課金UIをそのまま踏襲した表記</div>
+          <div class="diff-after">→ 日本のECで馴染みのある表記・単位へ調整</div>
+          <div class="diff-why">「いくら払うと何ができるか」が一目で分からないと、成人向けサービスでは特に離脱率が跳ね上がります。</div>
+        </div>
+        <div class="diff-card">
+          <span class="tag">会員登録導線</span>
+          <div class="diff-before">海外基準のステップ数・必須項目</div>
+          <div class="diff-after">→ 日本ユーザーが安心して進める順序へ再設計</div>
+          <div class="diff-why">個人情報入力に慎重な日本人ユーザー向けに、どこで何を求められるかの予測可能性が信頼感を左右します。</div>
+        </div>
+        <div class="diff-card">
+          <span class="tag">全体トーン</span>
+          <div class="diff-before">直訳調で続く説明文・ボタン文言</div>
+          <div class="diff-after">→ 自然な日本語のトーン＆マナーへ統一</div>
+          <div class="diff-why">「このサイト大丈夫かな」という不安は、文章の硬さ・不自然さから生まれることがほとんどです。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUE -->
+  <section class="value">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">What We Provide</span>
+        <h2>Kairosが提供できる価値</h2>
+        <p>単なる指摘で終わらせず、「なぜ違和感があるのか」「どう直すか」までセットで納品します。</p>
+      </div>
+      <div class="value-grid">
+        <div class="value-card">
+          <span class="value-num">01</span>
+          <h3>日本語ネイティブ品質チェック</h3>
+          <p>見出し・ボタン・説明文を一文単位で確認し、機械翻訳調の表現を自然な日本語の修正文案に差し替えます。</p>
+        </div>
+        <div class="value-card">
+          <span class="value-num">02</span>
+          <h3>UI / UXの違和感洗い出し</h3>
+          <p>日本のWebサービスの慣習と比較し、配置・操作感・情報量のズレを重要度付きで整理します。</p>
+        </div>
+        <div class="value-card">
+          <span class="value-num">03</span>
+          <h3>導線・コンバージョン分析</h3>
+          <p>会員登録からサービス利用、料金・クレジット購入までの一連の流れを実際にたどり、離脱ポイントを特定します。</p>
+        </div>
+        <div class="value-card">
+          <span class="value-num">04</span>
+          <h3>信頼感の診断</h3>
+          <p>FAQ・マイページ・決済周りなど、不安を感じやすい箇所を重点的に検証し、安心材料の見せ方を提案します。</p>
+        </div>
+        <div class="value-card">
+          <span class="value-num">05</span>
+          <h3>PC / SP 両実機検証レポート</h3>
+          <p>対象ページ・該当箇所・問題点・重要度・改善案・修正文案をスプレッドシートにまとめ、そのまま実装に回せる形で納品します。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOW -->
+  <section class="flow">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Process</span>
+        <h2>進め方・スケジュールイメージ</h2>
+        <p>短期間でも精度を落とさないよう、チェック範囲を最初に合意してから着手します。</p>
+      </div>
+      <div class="timeline">
+        <div class="step">
+          <h4>ヒアリング</h4>
+          <p>対象ページ・重点的に見てほしい項目・既知の課題をすり合わせ</p>
+        </div>
+        <div class="step">
+          <h4>実機チェック</h4>
+          <p>PC・スマートフォン両方で、登録〜利用〜決済までを実際に操作</p>
+        </div>
+        <div class="step">
+          <h4>違和感の洗い出し</h4>
+          <p>日本語・UI・導線・信頼感の観点で問題点を重要度別に抽出</p>
+        </div>
+        <div class="step">
+          <h4>改善案の作成</h4>
+          <p>修正文案・UI改善の方向性まで言語化し、根拠とセットで整理</p>
+        </div>
+        <div class="step">
+          <h4>レポート納品</h4>
+          <p>スプレッドシートで提出、必要に応じてすり合わせMTGを実施</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing">
+    <div class="wrap">
+      <h2>まずは、サイトを一緒に触らせてください。</h2>
+      <p>
+        初回のご依頼から、継続的なローカライズ・改善サポートまで柔軟に対応します。
+        「どこで日本人ユーザーが離れるのか」、私たちが実際に操作して見つけます。
+      </p>
+      <a class="cta-btn" href="#">
+        Kairosに相談してみる →
+      </a>
+      <div class="cta-note">ご提示予算 ¥10,000〜 ／ PC・スマートフォン両対応 ／ ご状況に応じたご提案が可能です</div>
+    </div>
+  </section>
+
+  <footer>
+    © Kairos — Web制作・システム開発チーム
+  </footer>
+
+</body>
+</html>
